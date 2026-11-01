@@ -53,7 +53,6 @@ It is a copilot, not an autopilot. **Nothing is ever submitted without your expl
 | **Your choice of AI** | Route requests to Gemini or OpenRouter, with automatic fallback if one provider fails. |
 | **Browser-assisted form prep** *(planned)* | Pre-fill application forms, then stop and wait for your approval before anything is submitted. |
 
-> AI output is probabilistic. Read every generated document before you send it.
 
 ## How it works
 
