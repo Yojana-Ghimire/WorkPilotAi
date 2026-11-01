@@ -111,7 +111,7 @@ flowchart TD
 | **PostgreSQL + pgvector** | The single system of record: users, profiles, jobs, embeddings, applications, and the task queue. |
 | **Local File Storage** | Original resumes and generated documents on disk (`/data`). |
 
-### Resume upload flow
+### Resume upload flow(Sequence Diagram)
 
 ```mermaid
 sequenceDiagram
