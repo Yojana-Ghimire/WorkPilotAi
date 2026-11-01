@@ -71,32 +71,6 @@ It is a copilot, not an autopilot. **Nothing is ever submitted without your expl
 
 Slow work (parsing, embeddings, matching, job discovery) runs in the background through a task queue stored in PostgreSQL, so there is no Redis or message broker to run.
 
-## Human approval, always
-
-This is a design rule of the project, not a setting.
-
-- No application is submitted automatically.
-- Generated documents are drafts until you review them.
-- The planned browser-assisted feature only **prepares** forms. It then stops and requires a clear, explicit approval action from you before anything is submitted.
-- Drafts never invent experience. Anything your profile does not support is shown as a gap.
-
-```mermaid
-stateDiagram-v2
-    [*] --> Saved
-    Saved --> Drafting
-    Drafting --> ReadyForReview
-    ReadyForReview --> Approved: Explicit user approval
-    Approved --> Applied
-    Applied --> Interviewing
-    Interviewing --> Offer
-    Interviewing --> Rejected
-    Applied --> Rejected
-    Saved --> Withdrawn
-    Drafting --> Withdrawn
-    Offer --> [*]
-    Rejected --> [*]
-    Withdrawn --> [*]
-```
 
 ## Architecture
 
@@ -165,9 +139,6 @@ sequenceDiagram
     A-->>W: Completed, ready to review
 ```
 
-## Quick start
-
-The quickest way to run JobPilot AI is Docker Compose: the database, the API, the background worker, and the web app in one file.
 
 ### Requirements
 
@@ -305,7 +276,7 @@ Everything is set through environment variables.
 
 > Never commit `.env`. Only `.env.example` belongs in the repository.
 
-## Choosing an AI provider
+## AI provider
 
 JobPilot AI sends every AI request through the **AI Provider Router**, so no other module depends on a specific vendor.
 
@@ -384,11 +355,6 @@ Self-hosting keeps the app, your database, and your files on your own machine. S
 
 Nothing else leaves your server. Read each provider's data policy before sending sensitive career details.
 
-Security basics:
-
-- Passwords are hashed, never stored in plain text.
-- Every protected endpoint requires authentication, and data is scoped per user.
-- Keep the API and web ports off the public internet and serve them through HTTPS.
 
 ## Development
 
@@ -473,14 +439,6 @@ jobpilot-ai/
 └── README.md
 ```
 
-## Known limitations
-
-- **One profile per account.** Each account maintains a single profile.
-- **Local file storage only.** Files live on the server's disk. Mount a volume and back it up.
-- **Two AI providers.** Only Gemini and OpenRouter are supported for now.
-- **Browser-assisted form prep is planned**, not yet available.
-- **Desktop-first interface.** Designed for a laptop or desktop browser.
-- **AI output needs review.** Drafts are grounded in your profile but can still contain mistakes.
 
 ## Roadmap
 
