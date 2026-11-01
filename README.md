@@ -43,50 +43,6 @@ database, cache, and future worker are separate runtime components,
 while backend business capabilities remain organized in one FastAPI
 codebase.
 
-##System architecture
-
-flowchart TB
-    U["User"] --> UI["Next.js Frontend<br/>TypeScript"]
-    UI <-->|"REST API · JSON / HTTP"| API["FastAPI Backend"]
-
-    subgraph BACKEND["Application Layer — Python"]
-        API --> AUTH["Authentication & User Management"]
-        API --> PROFILE["Profile & Resume Module"]
-        API --> JOBS["Job Discovery & Management"]
-        API --> MATCH["AI Matching Engine"]
-        API --> APPS["Application Tracking"]
-        API --> APPROVAL["Human Approval Service"]
-
-        PROFILE --> PARSER["Resume Parser<br/>PDF / DOCX"]
-        MATCH --> ROUTER["AI Provider Router"]
-        ROUTER --> GEMINI["Gemini — Primary"]
-        ROUTER --> OR["OpenRouter — Fallback"]
-
-        JOBS --> SOURCES["Job Sources / Integrations"]
-        APPROVAL --> BROWSER["Playwright Automation<br/>Planned"]
-    end
-
-    subgraph INFRA["Data & Infrastructure Layer"]
-        DB[("PostgreSQL + pgvector")]
-        REDIS[("Redis")]
-        FILES[("Local File Storage")]
-        WORKER["Background Worker<br/>Planned"]
-    end
-
-    AUTH --> DB
-    PROFILE --> DB
-    PROFILE --> FILES
-    JOBS --> DB
-    MATCH --> DB
-    APPS --> DB
-    APPROVAL --> DB
-
-    API --> REDIS
-    REDIS --> WORKER
-    WORKER --> JOBS
-    WORKER --> MATCH
-    BROWSER --> APPROVAL
-
 
 ### High-level architecture
 
