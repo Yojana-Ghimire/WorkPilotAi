@@ -8,17 +8,11 @@ tailored application documents, and track applications through their
 lifecycle. Browser-assisted form preparation is planned, with **explicit
 human approval required before any application is submitted**.
 
-> **Project status:** Early development / Phase 1 foundation. This
-> README documents both the current foundation and the intended target
-> architecture. Features marked as planned are not yet implemented in
-> the starter archive.
 
-------------------------------------------------------------------------
+
 
 ## Table of Contents
 
--   [Vision and goals](#vision-and-goals)
--   [Key principles](#key-principles)
 -   [Features](#features)
 -   [Architecture overview](#architecture-overview)
 -   [Technology stack](#technology-stack)
@@ -27,8 +21,7 @@ human approval required before any application is submitted**.
     pipeline](#job-discovery-and-filter-pipeline)
 -   [Job matching and ranking](#job-matching-and-ranking)
 -   [AI provider architecture](#ai-provider-architecture)
--   [Resume and cover letter
-    pipeline](#resume-and-cover-letter-pipeline)
+-  ==
 -   [Application and approval
     lifecycle](#application-and-approval-lifecycle)
 -   [Entity relationship diagram](#entity-relationship-diagram)
