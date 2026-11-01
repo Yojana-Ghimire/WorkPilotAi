@@ -21,7 +21,6 @@ human approval required before any application is submitted**.
     pipeline](#job-discovery-and-filter-pipeline)
 -   [Job matching and ranking](#job-matching-and-ranking)
 -   [AI provider architecture](#ai-provider-architecture)
--  ==
 -   [Application and approval
     lifecycle](#application-and-approval-lifecycle)
 -   [Entity relationship diagram](#entity-relationship-diagram)
@@ -38,74 +37,10 @@ human approval required before any application is submitted**.
 
 ------------------------------------------------------------------------
 
-## Vision and goals
-
-Job searching often involves repetitive work across multiple platforms:
-reviewing job descriptions, checking eligibility, tailoring resumes,
-writing cover letters, completing forms, and tracking application
-outcomes.
-
-JobPilot AI aims to bring these activities into one organized workflow.
-
-### Primary goals
-
-1.  Maintain one verified, reusable professional profile.
-2.  Collect and organize job opportunities from supported sources and
-    user submissions.
-3.  Filter opportunities using user preferences and job requirements.
-4.  Explain how well a job aligns with the user's skills, projects,
-    education, and experience.
-5.  Generate tailored resumes and cover letters grounded in verified
-    profile information.
-6.  Track applications, interviews, outcomes, and follow-ups.
-7.  Assist with repetitive browser form preparation where permitted.
-8.  Keep the user in control of external actions, especially application
-    submission.
-
-## Key principles
-
--   **Human-in-the-loop:** no application is submitted without explicit
-    user approval.
--   **Evidence-backed generation:** AI must not invent experience,
-    qualifications, certifications, skills, dates, or achievements.
--   **Privacy-conscious:** keep documents and the database local by
-    default; send only the minimum necessary information to external AI
-    providers.
--   **Explainable matching:** show why a job was recommended and which
-    requirements are missing.
--   **Provider abstraction:** AI features use a common interface so
-    providers can be changed or routed.
--   **Incremental delivery:** start as a modular monolith; introduce
-    background workers and more complex infrastructure only when needed.
-
-------------------------------------------------------------------------
-
 ## Features
 
-### Current Phase 1 foundation
-
-The starter archive currently includes:
-
--   FastAPI application foundation.
--   Next.js frontend scaffold.
--   PostgreSQL with the pgvector-enabled PostgreSQL image.
--   Redis service through Docker Compose.
--   Environment-based application and AI configuration.
--   Gemini primary and OpenRouter fallback provider adapters.
--   Centralized AI provider router.
--   AI generation smoke-test endpoint.
--   Basic service health and database readiness endpoints.
--   SQLAlchemy async database connection foundation.
--   Docker resource limits for local development.
-
-The current starter has **not** yet implemented the complete profile,
-job discovery, matching, resume, application tracking, authentication,
-or Playwright workflows described below.
-
-### Planned product features
-
   -----------------------------------------------------------------------
-  Module                              Planned capabilities
+  Module                               capabilities
   ----------------------------------- -----------------------------------
   Authentication                      Registration, login, secure
                                       sessions/tokens, account management
@@ -265,53 +200,6 @@ during development.
 
 ------------------------------------------------------------------------
 
-## Technology stack
-
-  -----------------------------------------------------------------------
-  Area                    Technology              Purpose
-  ----------------------- ----------------------- -----------------------
-  Frontend                Next.js 15, React 19    Web application
-
-  Frontend language       TypeScript              Type-safe UI
-                                                  development
-
-  Backend                 FastAPI                 REST API
-
-  Backend language        Python                  Business logic, AI
-                                                  integration, automation
-
-  Validation              Pydantic                Request and response
-                                                  validation
-
-  ORM                     SQLAlchemy async        Database access
-
-  Database                PostgreSQL 16           Relational persistence
-
-  Vector extension        pgvector                Semantic similarity
-                                                  search (planned use)
-
-  Cache / queue           Redis 7                 Caching and future task
-                                                  queue
-
-  Primary AI              Gemini API              Text generation and
-                                                  analysis
-
-  Fallback AI             OpenRouter API          Alternate model routing
-
-  HTTP client             HTTPX                   Async provider requests
-
-  Browser automation      Playwright              Supported website form
-                                                  assistance (planned)
-
-  Migrations              Alembic                 Schema versioning
-                                                  (planned setup)
-
-  Local services          Docker Compose          PostgreSQL and Redis
-
-  Testing                 Pytest (planned)        Automated tests
-  -----------------------------------------------------------------------
-
-------------------------------------------------------------------------
 
 ## Request lifecycle
 
@@ -363,19 +251,6 @@ flowchart TD
 13. **Observe:** record errors, latency, provider usage, and important
     actions.
 
-### Example: resume generation request
-
-1.  User selects a job and requests a tailored resume.
-2.  Backend verifies the user and job ownership.
-3.  Backend loads the professional profile and job description.
-4.  Relevant profile evidence is selected.
-5.  AI generates structured resume content.
-6.  Output is checked against source profile records.
-7.  A document is rendered and stored.
-8.  The generated version is returned for user review.
-9.  User edits or approves the document.
-
-------------------------------------------------------------------------
 
 ## Job discovery and filter pipeline
 
@@ -491,9 +366,8 @@ Suggested display bands (configurable):
   50--69     Moderate match
   Below 50   Low match
 
-The score is a recommendation aid, not a guarantee of eligibility or
-hiring success. The system should show the underlying matched and
-missing requirements, not just a number.
+ The system should show the underlying matched and
+missing requirements.
 
 ### Why pgvector?
 
@@ -533,7 +407,7 @@ flowchart TD
     I --> J
 ```
 
-Fallback is intended for transient failures such as network errors,
+Fallback is intended for transient failures like network errors,
 timeouts, HTTP 408, HTTP 429, and HTTP 5xx. Invalid credentials and
 malformed requests should not be silently hidden by fallback.
 
@@ -541,77 +415,9 @@ Provider free-tier availability, model routing, quotas, and data-use
 terms can change. Check the providers' current documentation before
 relying on a free tier for ongoing use.
 
-### AI safety and evidence rules
 
--   Treat job descriptions and web pages as untrusted input.
--   Do not allow external content to override system or application
-    rules.
--   Do not let AI execute arbitrary commands or directly submit
-    applications.
--   Require structured output and validate it before use.
--   Link generated claims to profile record IDs where possible.
--   Ask the user when source information is missing or ambiguous.
--   Minimize personal data sent to third-party providers.
+]
 
-------------------------------------------------------------------------
-
-## Resume and cover letter pipeline
-
-``` mermaid
-flowchart TD
-    A[Selected job] --> B[Load verified profile]
-    B --> C[Load job requirements]
-    C --> D[Select relevant profile evidence]
-    D --> E[Construct structured prompt]
-    E --> F[AI provider router]
-    F --> G[Parse structured result]
-    G --> H[Validate claims against profile]
-    H --> I{Evidence supported?}
-    I -->|No| J[Reject claim / ask user]
-    I -->|Yes| K[Render document]
-    K --> L[Save version and source references]
-    L --> M[User preview and edits]
-```
-
-Planned document capabilities:
-
--   Role-specific professional summary.
--   Relevant skills, experience, projects, and certifications.
--   ATS-friendly layouts.
--   PDF and DOCX export.
--   Separate versions per job/application.
--   Source record references and content hashes.
--   User review before an application package is approved.
-
-**Non-negotiable rule:** JobPilot AI must never fabricate
-qualifications, employers, job titles, certifications, project outcomes,
-dates, or skills.
-
-------------------------------------------------------------------------
-
-## Application and approval lifecycle
-
-``` mermaid
-flowchart TD
-    A[Save selected job] --> B[Create application draft]
-    B --> C[Prepare resume and cover letter]
-    C --> D[Validate required application fields]
-    D --> E{Valid?}
-    E -->|No| F[Show missing fields]
-    E -->|Yes| G[User reviews application package]
-    G --> H{Package approved?}
-    H -->|No| I[Keep draft / edit]
-    H -->|Yes| J[Record approval for exact versions]
-    J --> K[Playwright prepares supported form]
-    K --> L[Show final form review]
-    L --> M{Explicit final submission approval?}
-    M -->|No| N[Stop and save draft]
-    M -->|Yes| O[Backend verifies approval and hashes]
-    O --> P{Approval valid and unused?}
-    P -->|No| Q[Require new approval]
-    P -->|Yes| R[Submit]
-    R --> S[Capture confirmation]
-    S --> T[Update application status]
 ```
 
 Approval must be enforced by the backend. A frontend button or
