@@ -13,9 +13,7 @@ human approval required before any application is submitted**.
 
 ## Table of Contents
 
--   [Features](#features)
 -   [Architecture overview](#architecture-overview)
--   [Technology stack](#technology-stack)
 -   [Request lifecycle](#request-lifecycle)
 -   [Job discovery and filter
     pipeline](#job-discovery-and-filter-pipeline)
@@ -29,67 +27,12 @@ human approval required before any application is submitted**.
 -   [Quickstart](#quickstart)
 -   [Configuration reference](#configuration-reference)
 -   [Development workflow](#development-workflow)
--   [Security and privacy](#security-and-privacy)
--   [Roadmap](#roadmap)
--   [Troubleshooting](#troubleshooting)
--   [Contributing](#contributing)
 -   [License](#license)
 
 ------------------------------------------------------------------------
 
-## Features
+        
 
-  -----------------------------------------------------------------------
-  Module                               capabilities
-  ----------------------------------- -----------------------------------
-  Authentication                      Registration, login, secure
-                                      sessions/tokens, account management
-
-  Professional profile                Personal details, education,
-                                      experience, skills, projects,
-                                      certifications, links
-
-  Job discovery                       Add jobs manually, import supported
-                                      sources, parse descriptions, save
-                                      opportunities
-
-  Job filtering                       Validate, normalize, deduplicate,
-                                      expire/archive, filter by location
-                                      and employment type
-
-  Job matching                        Skill matching, experience
-                                      compatibility, project relevance,
-                                      weighted score, explanations
-
-  Resume builder                      Tailored summaries and experience,
-                                      relevant project selection,
-                                      ATS-friendly DOCX/PDF, versioning
-
-  Cover letter generator              Job-specific drafts, editable
-                                      versions, evidence-backed content
-
-  Application tracker                 Saved, prepared, awaiting approval,
-                                      submitted, interview, offer,
-                                      rejected, withdrawn
-
-  Browser assistance                  Playwright-based navigation and
-                                      form preparation on supported sites
-
-  Interview preparation               Technical and behavioral questions,
-                                      mock practice, evidence-based STAR
-                                      prompts
-
-  Skill gap analysis                  Identify missing or frequently
-                                      requested skills and learning
-                                      priorities
-
-  Notifications                       Interview reminders, follow-ups,
-                                      and application status reminders
-
-  Dashboard                           Job recommendations, match
-                                      summaries, application statistics,
-                                      upcoming interviews
-  -----------------------------------------------------------------------
 
 ------------------------------------------------------------------------
 
@@ -99,6 +42,51 @@ JobPilot AI starts as a **modular monolith**. The frontend, API,
 database, cache, and future worker are separate runtime components,
 while backend business capabilities remain organized in one FastAPI
 codebase.
+
+##System architecture
+
+flowchart TB
+    U["User"] --> UI["Next.js Frontend<br/>TypeScript"]
+    UI <-->|"REST API · JSON / HTTP"| API["FastAPI Backend"]
+
+    subgraph BACKEND["Application Layer — Python"]
+        API --> AUTH["Authentication & User Management"]
+        API --> PROFILE["Profile & Resume Module"]
+        API --> JOBS["Job Discovery & Management"]
+        API --> MATCH["AI Matching Engine"]
+        API --> APPS["Application Tracking"]
+        API --> APPROVAL["Human Approval Service"]
+
+        PROFILE --> PARSER["Resume Parser<br/>PDF / DOCX"]
+        MATCH --> ROUTER["AI Provider Router"]
+        ROUTER --> GEMINI["Gemini — Primary"]
+        ROUTER --> OR["OpenRouter — Fallback"]
+
+        JOBS --> SOURCES["Job Sources / Integrations"]
+        APPROVAL --> BROWSER["Playwright Automation<br/>Planned"]
+    end
+
+    subgraph INFRA["Data & Infrastructure Layer"]
+        DB[("PostgreSQL + pgvector")]
+        REDIS[("Redis")]
+        FILES[("Local File Storage")]
+        WORKER["Background Worker<br/>Planned"]
+    end
+
+    AUTH --> DB
+    PROFILE --> DB
+    PROFILE --> FILES
+    JOBS --> DB
+    MATCH --> DB
+    APPS --> DB
+    APPROVAL --> DB
+
+    API --> REDIS
+    REDIS --> WORKER
+    WORKER --> JOBS
+    WORKER --> MATCH
+    BROWSER --> APPROVAL
+
 
 ### High-level architecture
 
